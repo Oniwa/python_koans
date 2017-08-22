@@ -18,17 +18,32 @@
 
 from runner.koan import *
 
-class Proxy:
+
+class Proxy(object):
     def __init__(self, target_object):
-        # WRITE CODE HERE
+        object.__setattr__(self, '_obj', target_object)
+        object.__setattr__(self, '_messages', [])
 
-        #initialize '_obj' attribute last. Trust me on this!
-        self._obj = target_object
+    def __getattr__(self, item):
+        self._messages.append(item)
+        return getattr(self._obj, item)
 
-    # WRITE CODE HERE
+    def __setattr__(self, key, value):
+        self._messages.append(key)
+        setattr(self._obj, key, value)
 
+    def messages(self):
+        return self._messages
+
+    def was_called(self, attr_name):
+        return attr_name in self._messages
+
+    def number_of_times_called(self, attr_name):
+        return self._messages.count(attr_name)
 # The proxy object should pass the following Koan:
 #
+
+
 class AboutProxyObjectProject(Koan):
     def test_proxy_method_returns_wrapped_object(self):
         # NOTE: The Television class is defined below
